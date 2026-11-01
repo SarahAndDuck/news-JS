@@ -1,30 +1,49 @@
+import { TRequestParams } from '../../types';
+
+export enum HttpMethod {
+    GET = 'GET',
+    POST = 'POST',
+}
+
+export enum Endpoint {
+    Everything = 'everything',
+    Sources = 'sources',
+}
+
+type TCallback<T> = (data: T) => void;
+
 class Loader {
-    constructor(baseLink, options) {
+    private baseLink: string;
+
+    private options: TRequestParams;
+
+    constructor(baseLink: string, options: TRequestParams) {
         this.baseLink = baseLink;
         this.options = options;
     }
 
-    getResp(
-        { endpoint, options = {} },
-        callback = () => {
+    public getResp<T>(
+        { endpoint, options = {} }: { endpoint: Endpoint; options?: TRequestParams },
+        callback: TCallback<T> = () => {
             console.error('No callback for GET response');
         }
-    ) {
-        this.load('GET', endpoint, callback, options);
+    ): void {
+        this.load<T>(HttpMethod.GET, endpoint, callback, options);
     }
 
-    errorHandler(res) {
+    private errorHandler(res: Response): Response {
         if (!res.ok) {
-            if (res.status === 401 || res.status === 404)
+            if (res.status === 401 || res.status === 404) {
                 console.log(`Sorry, but there is ${res.status} error: ${res.statusText}`);
-            throw Error(res.statusText);
+            }
+            throw new Error(res.statusText);
         }
 
         return res;
     }
 
-    makeUrl(options, endpoint) {
-        const urlOptions = { ...this.options, ...options };
+    private makeUrl(options: TRequestParams, endpoint: Endpoint): string {
+        const urlOptions: TRequestParams = { ...this.options, ...options };
         let url = `${this.baseLink}${endpoint}?`;
 
         Object.keys(urlOptions).forEach((key) => {
@@ -34,11 +53,16 @@ class Loader {
         return url.slice(0, -1);
     }
 
-    load(method, endpoint, callback, options = {}) {
+    private load<T>(
+        method: HttpMethod,
+        endpoint: Endpoint,
+        callback: TCallback<T>,
+        options: TRequestParams = {}
+    ): void {
         fetch(this.makeUrl(options, endpoint), { method })
             .then(this.errorHandler)
             .then((res) => res.json())
-            .then((data) => callback(data))
+            .then((data: unknown) => callback(data as T))
             .catch((err) => console.error(err));
     }
 }
