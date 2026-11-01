@@ -1,37 +1,44 @@
 import AppLoader from './appLoader';
+import { Endpoint, TCallback } from './loader';
+import { IArticlesResponse, ISourcesResponse, TRequestParams } from '../../types';
 
 class AppController extends AppLoader {
-    getSources(callback) {
-        super.getResp(
+    public getSources(callback: TCallback<ISourcesResponse>): void {
+        super.getResp<ISourcesResponse>(
             {
-                endpoint: 'sources',
+                endpoint: Endpoint.Sources,
             },
             callback
         );
     }
 
-    getNews(e, callback) {
-        let target = e.target;
-        const newsContainer = e.currentTarget;
+    public getNews(e: MouseEvent, callback: TCallback<IArticlesResponse>): void {
+        let target = e.target as HTMLElement | null;
+        const newsContainer = e.currentTarget as HTMLElement | null;
 
-        while (target !== newsContainer) {
+        if (!target || !newsContainer) {
+            return;
+        }
+
+        while (target && target !== newsContainer) {
             if (target.classList.contains('source__item')) {
                 const sourceId = target.getAttribute('data-source-id');
-                if (newsContainer.getAttribute('data-source') !== sourceId) {
+                if (sourceId && newsContainer.getAttribute('data-source') !== sourceId) {
                     newsContainer.setAttribute('data-source', sourceId);
-                    super.getResp(
+                    const options: Partial<TRequestParams> = {
+                        sources: sourceId,
+                    };
+                    super.getResp<IArticlesResponse>(
                         {
-                            endpoint: 'everything',
-                            options: {
-                                sources: sourceId,
-                            },
+                            endpoint: Endpoint.Everything,
+                            options,
                         },
                         callback
                     );
                 }
                 return;
             }
-            target = target.parentNode;
+            target = target.parentElement;
         }
     }
 }
