@@ -10,7 +10,7 @@ export enum Endpoint {
     Sources = 'sources',
 }
 
-type TCallback<T> = (data: T) => void;
+export type TCallback<T> = (data: T) => void;
 
 class Loader {
     private baseLink: string;
