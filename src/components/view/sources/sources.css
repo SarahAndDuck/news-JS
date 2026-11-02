@@ -1,14 +1,15 @@
 .sources {
     display: flex;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     width: 100%;
-    height: 120px;
+    min-height: 120px;
     overflow: auto;
     align-items: center;
     font: 300 1em 'Fira Sans', sans-serif;
 }
 
 .source__item {
+    flex: 1 1 auto;
     background: none;
     border: 2px solid #30c5ff;
     font: inherit;
