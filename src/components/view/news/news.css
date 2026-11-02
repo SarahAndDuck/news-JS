@@ -164,3 +164,21 @@
         padding-left: 25px;
     }
 }
+@media (max-width: 480px) {
+    .news__item {
+        margin: 0.5rem auto;
+        border-radius: 3px;
+    }
+
+    .news__item .news__meta {
+        height: 160px;
+    }
+
+    .news__item .news__description {
+        padding: 0.75rem;
+    }
+
+    .news__item .news__description h2 {
+        font-size: 1.3rem;
+    }
+}
